@@ -1,7 +1,8 @@
 ##figure2
 setwd("~/Desktop/yr5/summ/bioinformatics_util/data/100kb/")
 source("../../draft.R")
-install_pkg(c("ggpubr","ggplot2", "tidyr", "data.table","rstatix"), "common")
+install_pkg(c("ggpubr","ggplot2", "tidyr", "data.table","rstatix","dplyr"), "common")
+install_pkg(c("GenomicRanges"), "bioconductor")
 set.seed(123)
 
 get_df <- function(rbko, wt, gap_type, gap_width, group_name){
@@ -42,7 +43,7 @@ get_df <- function(rbko, wt, gap_type, gap_width, group_name){
 }
 
 plot_boxplot <- function(all_df, outpath, y.position=NULL, ylab = NULL,rotate = FALSE, colors = NULL,
-                        de = "pdf", w = 5, h = 3.5, dp = 600) {
+                        de = "pdf", w = 5, h = 3.5, dp = 600, ylims = NULL) {
   stat_test <- all_df %>%
     group_by(Sig_type) %>%
     wilcox_test(Sig ~ group, exact = FALSE, paired = FALSE, 
@@ -67,6 +68,9 @@ plot_boxplot <- function(all_df, outpath, y.position=NULL, ylab = NULL,rotate = 
   if (!is.null(colors)) {
     a = a + scale_fill_manual(values = colors)
   }
+  if(!is.null(ylims)) {
+    a = a + ylim(ylims)
+  }
   ggsave(outpath, device = de, width = w, height = h, dpi = dp)
 }
 
@@ -74,33 +78,33 @@ rbko <- fread("ML-RbKO_CPD.fc.signal.bigwig_binned100kb.csv", select = c(2,3,4,7
 wt <- fread("ML-WT_CPD.fc.signal.bigwig_binned100kb.csv", select = c(2,3,4,7))
 all_df <- get_df(rbko, wt, "centromere", 1000000, "Pericentric")
 ylabel <- "CPD log2(FC)"
-plot_boxplot(all_df, "../../plot/CPD_Centromere.pdf", c(0.8,0.8,0.45), ylabel, TRUE, colors = c("darkorchid", "white"))
+plot_boxplot(all_df, "../../plot/CPD_Centromere.pdf", c(0.8,0.8,0.45), ylabel, TRUE, colors = c("darkorchid", "white"), ylims=c(-0.54,0.8))
 
 rbko <- fread("ML-RbKO_H3K9me3_new.fc.signal.bigwig_binned100kb.csv", select = c(2,3,4,7))
 wt <- fread("ML-WT_H3K9me3_new.fc.signal.bigwig_binned100kb.csv", select = c(2,3,4,7))
 all_df <- get_df(rbko, wt, "centromere", 1000000, "Pericentric")
 ylabel <- "H3K9me3 log2(FC)"
-plot_boxplot(all_df, "../../plot/H3K9me3_Centromere_new.pdf", c(1.4,1.4,0.4), ylabel, TRUE, colors = c("darkorchid", "white"))
+plot_boxplot(all_df, "../../plot/H3K9me3_Centromere_new.pdf", c(1.4,1.4,0.4), ylabel, TRUE, colors = c("darkorchid", "white"),ylims=c(-1.1, 1.5))
 
 rbko <- fread("ML-RbKO_H3K27me3_new.fc.signal.bigwig_binned100kb.csv", select = c(2,3,4,7))
 wt <- fread("ML-WT_H3K27me3_new.fc.signal.bigwig_binned100kb.csv", select = c(2,3,4,7))
 all_df <- get_df(rbko, wt, "centromere", 1000000, "Pericentric")
 ylabel <- "H3K27me3 log2(FC)"
-plot_boxplot(all_df, "../../plot/H3K27me3_Centromere_new.pdf", c(1.9,1.9,0.5), ylabel, TRUE, colors = c("darkorchid", "white"))
+plot_boxplot(all_df, "../../plot/H3K27me3_Centromere_new.pdf", c(1.9,1.9,0.5), ylabel, TRUE, colors = c("darkorchid", "white"),ylims=c(-1.8, 2))
 
 rbko <- fread("ML-RbKO_CPD.fc.signal.bigwig_binned100kb.csv", select = c(2,3,4,7))
 wt <- fread("ML-WT_CPD.fc.signal.bigwig_binned100kb.csv", select = c(2,3,4,7))
 all_df <- get_df(rbko, wt, "telomere", 100000, "Subtelomeric") 
 all_df$group = factor(all_df$group, levels = c("Subtelomeric","Random"))
 ylabel <- "CPD log2(FC)"
-plot_boxplot(all_df, "../../plot/CPD_Telomere.pdf", c(0.7,0.7, 0.45), ylabel, TRUE, colors = c("plum2", "white"))
+plot_boxplot(all_df, "../../plot/CPD_Telomere.pdf", c(0.7,0.7, 0.45), ylabel, TRUE, colors = c("plum2", "white"), ylims=c(-0.8,0.8))
 
 rbko <- fread("ML-RbKO_H3K9me3_new.fc.signal.bigwig_binned100kb.csv", select = c(2,3,4,7))
 wt <- fread("ML-WT_H3K9me3_new.fc.signal.bigwig_binned100kb.csv", select = c(2,3,4,7))
 all_df <- get_df(rbko, wt, "telomere", 100000, "Subtelomeric")
 all_df$group = factor(all_df$group, levels = c("Subtelomeric","Random"))
 ylabel <- "H3K9me3 log2(FC)"
-plot_boxplot(all_df, "../../plot/H3K9me3_Telomere_new.pdf", c(1.6,1.6,0.4), ylabel, TRUE , colors = c("plum2", "white"))
+plot_boxplot(all_df, "../../plot/H3K9me3_Telomere_new.pdf", c(1.6,1.6,0.4), ylabel, TRUE , colors = c("plum2", "white"), ylims=c(-1.2,1.7))
 
 rbko <- fread("ML-RbKO_H3K27me3_new.fc.signal.bigwig_binned100kb.csv", select = c(2,3,4,7))
 wt <- fread("ML-WT_H3K27me3_new.fc.signal.bigwig_binned100kb.csv", select = c(2,3,4,7))
