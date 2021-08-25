@@ -9,3 +9,7 @@ testchrom3d/
 whole_fig_svg/
 .rds
 fig3.svg
+stjude_snv_extraction_for_annovar.R
+tradseq_to_repenrich2.sh
+extract_umi.sh
+build_signal_track2.R
